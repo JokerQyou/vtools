@@ -1,21 +1,23 @@
 import {
   ActionIcon, Avatar, Box, Center, Container,
-  Group, Loader, Paper, Stack, Text, ThemeIcon, Tooltip,
+  Group, Loader, Menu, Paper, Stack, Text, ThemeIcon, Tooltip,
 } from "@mantine/core"
 import { useListState } from "@mantine/hooks"
 import { showNotification } from "@mantine/notifications"
-import { IconCheck, IconCircleCheck, IconMovie, IconSearch } from "@tabler/icons"
+import { IconCheck, IconDots, IconMovie, IconPlaylistX, IconSearch } from "@tabler/icons"
 import { invoke } from "@tauri-apps/api"
+import { sep } from "@tauri-apps/api/path"
 import { listen } from "@tauri-apps/api/event"
 import { CSSProperties, useEffect, useState } from "react"
 
 const baseName = (f: string) => {
-  const fp = f.split('/')
+  const fp = f.split(sep)
   return fp[fp.length - 1]
 }
 const extension = (f: string) => {
+  if (!f.includes('.')) { return '' }
   const fp = f.split('.')
-  return fp[fp.length - 1]
+  return fp[fp.length - 1].toLowerCase()
 }
 
 type FileListItemProps = {
@@ -73,7 +75,7 @@ export const Flv2Mp4Tool = () => {
       const deduppedFiles = (e.payload as string[]).filter(
         f => !droppedFiles.includes(f)
       )
-      const validFiles = deduppedFiles.filter(f => extension(f).toLowerCase() === 'flv')
+      const validFiles = deduppedFiles.filter(f => extension(f) === 'flv')
       if (validFiles.length < deduppedFiles.length) {
         showNotification({
           title: 'FLV转MP4',
@@ -110,6 +112,16 @@ export const Flv2Mp4Tool = () => {
       unlistenDropCancelled?.then(f => f())
     }
   })
+  const clearFinishedFiles = () => {
+    droppedFiles.filter(f => fileStates[f] === Status.Finished).forEach(f => {
+      setFileStates(states => {
+        const newStates = { ...fileStates }
+        delete newStates[f]
+        return newStates
+      })
+      dropper.remove(droppedFiles.indexOf(f))
+    })
+  }
 
   return (
     <Container>
@@ -117,9 +129,7 @@ export const Flv2Mp4Tool = () => {
         <Stack
           justify='flex-start'
           spacing='md'
-          sx={theme => ({
-            width: '100%',
-          })}>
+          w='100%'>
           <Box
             sx={theme => ({
               borderStyle: 'dashed',
@@ -130,8 +140,6 @@ export const Flv2Mp4Tool = () => {
                 theme.colors.dark[3]
               ),
               cursor: 'default',
-              width: '100%',
-              height: 120,
               borderRadius: 3,
               userSelect: 'none',
               backgroundColor: dropping ? (
@@ -142,6 +150,8 @@ export const Flv2Mp4Tool = () => {
                 )
               ) : 'unset',
             })}
+            w='100%'
+            h={120}
           >
             <Center h='100%'>
               {dropping ? (
@@ -151,17 +161,47 @@ export const Flv2Mp4Tool = () => {
               )}
             </Center>
           </Box>
-          <Stack justify='flex-start' spacing='xs'>
+          <Container fluid pos='relative' p={0} mx='unset'>
             {droppedFiles.length === 0 ? (
               <Center>
                 <Text c='dimmed'>列表为空</Text>
               </Center>
             ) : (
-              droppedFiles.map(f => (
-                <FileListItem key={f} filepath={f} status={fileStates[f] || Status.Processing} />
-              ))
+              <>
+                <Menu shadow='md' position='bottom-end' offset={0}>
+                  <Menu.Target>
+                    <ActionIcon
+                      size='md'
+                      radius='sm'
+                      color='blue'
+                      pos='absolute'
+                      right={0}
+                      top={0}
+                    >
+                      <IconDots size={18} />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown sx={theme => ({
+                    userSelect: 'none',
+                  })}>
+                    <Menu.Item
+                      icon={<IconPlaylistX size={14} />}
+                      onClick={clearFinishedFiles}
+                    >清除已完成的项</Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+                <Stack justify='flex-start' spacing='xs' mt={40}>
+                  {droppedFiles.map(f => (
+                    <FileListItem
+                      key={f}
+                      filepath={f}
+                      status={fileStates[f] || Status.Processing}
+                    />
+                  ))}
+                </Stack>
+              </>
             )}
-          </Stack>
+          </Container>
         </Stack>
       </Center>
     </Container>
