@@ -2,7 +2,7 @@ import {
   ActionIcon, Avatar, Box, Center, Container,
   Group, Loader, Menu, Paper, Stack, Text, ThemeIcon, Tooltip,
 } from "@mantine/core"
-import { useListState } from "@mantine/hooks"
+import { useListState, useSetState } from "@mantine/hooks"
 import { showNotification } from "@mantine/notifications"
 import { IconCheck, IconDots, IconMovie, IconPlaylistX, IconSearch } from "@tabler/icons"
 import { invoke } from "@tauri-apps/api"
@@ -35,7 +35,6 @@ const FileListItem = ({ filepath, style, status }: FileListItemProps) => {
         <Text size='sm' sx={theme => ({
           userSelect: 'all',
         })}>{baseName(filepath)}</Text>
-        {/* <Code>{baseName(f)}</Code> */}
         <Group sx={theme => ({
           flex: 1,
           justifyContent: 'flex-end',
@@ -66,7 +65,7 @@ const enum Status {
 export const Flv2Mp4Tool = () => {
   const [dropping, setDropping] = useState(false);
   const [droppedFiles, dropper] = useListState<string>([])
-  const [fileStates, setFileStates] = useState<{ [key: string]: Status }>({})
+  const [fileStates, setFileStates] = useSetState<{ [key: string]: Status }>({});
 
   useEffect(() => {
     const unlisten = listen('tauri://file-drop', e => {
@@ -87,10 +86,9 @@ export const Flv2Mp4Tool = () => {
       if (validFiles.length > 0) {
         dropper.append(...validFiles)
         validFiles.forEach(f => {
-          setFileStates({ ...fileStates, [f]: Status.Processing })
+          setFileStates(current => ({ ...current, [f]: Status.Processing }))
           invoke('flv2mp4', { sourceFpath: f }).then((r: any) => {
-            console.log(r)
-            setFileStates({ ...fileStates, [f]: Status.Finished })
+            setFileStates(current => ({ ...current, [f]: Status.Finished }))
           })
         })
       }
@@ -98,7 +96,7 @@ export const Flv2Mp4Tool = () => {
     return () => {
       unlisten?.then(f => f())
     }
-  })
+  }, [])
 
   useEffect(() => {
     const unlistenDropHover = listen('tauri://file-drop-hover', e => {
@@ -111,16 +109,16 @@ export const Flv2Mp4Tool = () => {
       unlistenDropHover?.then(f => f())
       unlistenDropCancelled?.then(f => f())
     }
-  })
+  }, [])
+
   const clearFinishedFiles = () => {
-    droppedFiles.filter(f => fileStates[f] === Status.Finished).forEach(f => {
-      setFileStates(states => {
-        const newStates = { ...fileStates }
-        delete newStates[f]
-        return newStates
-      })
-      dropper.remove(droppedFiles.indexOf(f))
-    })
+    const finishedFiles = droppedFiles.filter(f => fileStates[f] === Status.Finished)
+    dropper.remove(...finishedFiles.map(f => droppedFiles.indexOf(f)))
+    setFileStates(current => (
+      Object.fromEntries(
+        Object.entries(current).filter(([f, s]) => !finishedFiles.includes(f))
+      )
+    ))
   }
 
   return (
