@@ -9,6 +9,7 @@ import { invoke } from "@tauri-apps/api"
 import { sep } from "@tauri-apps/api/path"
 import { listen } from "@tauri-apps/api/event"
 import { CSSProperties, useEffect, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 
 const baseName = (f: string) => {
   const fp = f.split(sep)
@@ -128,44 +129,9 @@ export const Flv2Mp4Tool = () => {
           justify='flex-start'
           spacing='md'
           w='100%'>
-          <Box
-            sx={theme => ({
-              borderStyle: 'dashed',
-              borderWidth: 3,
-              borderColor: theme.colorScheme === 'dark' ? (
-                theme.colors.gray[3]
-              ) : (
-                theme.colors.dark[3]
-              ),
-              cursor: 'default',
-              borderRadius: 3,
-              userSelect: 'none',
-              backgroundColor: dropping ? (
-                theme.colorScheme === 'dark' ? (
-                  theme.colors.dark[3]
-                ) : (
-                  theme.colors.gray[3]
-                )
-              ) : 'unset',
-            })}
-            w='100%'
-            h={120}
-          >
-            <Center h='100%'>
-              {dropping ? (
-                '松开以放入文件'
-              ) : (
-                '文件拖入此处'
-              )}
-            </Center>
-          </Box>
           <Container fluid pos='relative' p={0} mx='unset'>
-            {droppedFiles.length === 0 ? (
-              <Center>
-                <Text c='dimmed'>列表为空</Text>
-              </Center>
-            ) : (
-              <>
+            <>
+              {droppedFiles.length > 0 && (
                 <Menu shadow='md' position='bottom-end' offset={0}>
                   <Menu.Target>
                     <ActionIcon
@@ -188,17 +154,39 @@ export const Flv2Mp4Tool = () => {
                     >清除已完成的项</Menu.Item>
                   </Menu.Dropdown>
                 </Menu>
-                <Stack justify='flex-start' spacing='xs' mt={40}>
+              )}
+              <Stack justify='flex-start' spacing='xs' mt={40}>
+                <AnimatePresence>
+                  {droppedFiles.length === 0 && (
+                    <motion.div
+                      key='empty-placeholder'
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: .2, ease: 'easeInOut' }}
+                    >
+                      <Center>
+                        <Text c='dimmed'>列表为空</Text>
+                      </Center>
+                    </motion.div>
+                  )}
                   {droppedFiles.map(f => (
-                    <FileListItem
+                    <motion.div
                       key={f}
-                      filepath={f}
-                      status={fileStates[f] || Status.Processing}
-                    />
+                      initial={{ opacity: 0, x: 200 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -100 }}
+                      transition={{ duration: .2 }}
+                    >
+                      <FileListItem
+                        filepath={f}
+                        status={fileStates[f] || Status.Processing}
+                      />
+                    </motion.div>
                   ))}
-                </Stack>
-              </>
-            )}
+                </AnimatePresence>
+              </Stack>
+            </>
           </Container>
         </Stack>
       </Center>
