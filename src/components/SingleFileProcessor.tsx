@@ -1,4 +1,3 @@
-
 import {
   ActionIcon, Avatar, Center, Container,
   Group, Loader, Menu, Paper, Stack, Text, ThemeIcon, Tooltip,
@@ -34,14 +33,32 @@ type FileListItemProps = {
 }
 const FileListItem = ({ filepath, style, status }: FileListItemProps) => {
   return (
-    <Paper p='xs' withBorder style={style}>
+    <Paper
+      p='xs'
+      withBorder
+      style={style}
+      sx={theme => ({
+        backgroundColor: (status === Status.Finished) ? theme.colors.green[0] : 'unset',
+      })}>
       <Group spacing='xs'>
-        <Avatar color='blue'>
+        <Avatar color={(status === Status.Finished) ? 'teal' : 'blue'}>
           <IconMovie />
         </Avatar>
-        <Text size='sm' sx={theme => ({
-          userSelect: 'all',
-        })}>{baseName(filepath)}</Text>
+        <Tooltip
+          label={baseName(filepath)}
+          withArrow
+          multiline
+          w={'80%'}
+        >
+          <Text
+            size='sm'
+            sx={theme => ({
+              userSelect: 'all',
+              maxWidth: '60%',
+            })}
+            truncate
+          >{baseName(filepath)}</Text>
+        </Tooltip>
         <Group sx={theme => ({
           flex: 1,
           justifyContent: 'flex-end',
