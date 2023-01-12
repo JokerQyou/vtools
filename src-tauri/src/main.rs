@@ -4,6 +4,7 @@
 )]
 
 mod flv2mp4;
+mod extract_audio;
 
 use tauri::Manager;
 
@@ -23,7 +24,7 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            flv2mp4::flv2mp4,
+            flv2mp4::flv2mp4, extract_audio::extract_audio,
         ])
         .run(tauri::generate_context!())
         .expect("error while running vtools");

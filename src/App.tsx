@@ -5,6 +5,7 @@ import "./App.css";
 import { AppShell, Navbar, Header, Box, NavLink } from '@mantine/core';
 import { IconMovie, IconMusic, IconSlice } from "@tabler/icons";
 import { Flv2Mp4Tool } from "./components/ToolFlv2Mp4";
+import { ExtractAudioTool } from "./components/ToolExtractAudio";
 
 const enum Tool {
   Flv2mp4 = 'FLV转MP4',
@@ -55,7 +56,7 @@ export default () => {
         <Flv2Mp4Tool />
       )}
       {currentTool === Tool.ExtractAudio && (
-        <>Extract audio</>
+        <ExtractAudioTool />
       )}
       {currentTool === Tool.EncodeTrim && (
         <>Trim and re-encode</>
