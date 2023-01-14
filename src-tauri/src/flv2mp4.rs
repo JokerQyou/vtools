@@ -1,9 +1,11 @@
+use std::path::PathBuf;
+use std::process::Stdio;
+
+use ffmpeg_cli::{FfmpegBuilder, File, Parameter};
 use futures::future::ready;
 use futures::stream::StreamExt;
-use std::process::Stdio;
-use std::path::PathBuf;
-use ffmpeg_cli::{FfmpegBuilder, File, Parameter};
-use crate::ffmpeg::{find_ffmpeg_executable, SetCommandExt};
+
+use crate::ffmpeg::SetCommandExt;
 
 #[tauri::command]
 pub async fn flv2mp4(source_fpath: &str) -> Result<String, ()> {

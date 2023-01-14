@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 use std::process::Stdio;
+
 use ffmpeg_cli::{FfmpegBuilder, File, Parameter};
 use futures::future::ready;
-use crate::ffmpeg::{find_ffmpeg_executable, SetCommandExt};
+
+use crate::ffmpeg::SetCommandExt;
 
 #[tauri::command]
 pub async fn extract_audio(source_fpath: &str) -> Result<String, ()> {
