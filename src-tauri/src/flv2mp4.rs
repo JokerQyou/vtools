@@ -24,14 +24,7 @@ pub async fn flv2mp4(source_fpath: &str) -> Result<String, ()> {
         );
 
     let ffmpeg = builder.run().await.unwrap();
-    ffmpeg
-        .progress
-        .for_each(|x| {
-            // dbg!(x.unwrap());
-            ready(())
-        })
-        .await;
-    let output = ffmpeg.process.wait_with_output().unwrap();
-    dbg!(output);
+    dbg!(ffmpeg.process.wait_with_output().unwrap_or_default());
+
     Ok(String::from(target_fpath.to_str().unwrap()))
 }
