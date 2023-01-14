@@ -7,11 +7,10 @@ use crate::ffmpeg::{find_ffmpeg_executable, SetCommandExt};
 
 #[tauri::command]
 pub async fn flv2mp4(source_fpath: &str) -> Result<String, ()> {
-    let ffmpeg = find_ffmpeg_executable().unwrap();
     let target_fpath = PathBuf::from(source_fpath)
         .with_extension("mp4");
     let builder = FfmpegBuilder::new()
-        .set_command(ffmpeg)
+        .locate_command()
         .stderr(Stdio::piped())
         .option(Parameter::Single("nostdin"))
         .option(Parameter::Single("y"))

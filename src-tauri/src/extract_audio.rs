@@ -6,11 +6,10 @@ use crate::ffmpeg::{find_ffmpeg_executable, SetCommandExt};
 
 #[tauri::command]
 pub async fn extract_audio(source_fpath: &str) -> Result<String, ()> {
-    let ffmpeg = find_ffmpeg_executable().unwrap();
     let target_fpath = PathBuf::from(source_fpath)
         .with_extension("m4a");
     let builder = FfmpegBuilder::new()
-        .set_command(ffmpeg)
+        .locate_command()
         .stderr(Stdio::piped())
         .option(Parameter::Single("nostdin"))
         .option(Parameter::Single("y"))
