@@ -1,8 +1,4 @@
-use std::borrow::Borrow;
 use std::fs;
-use std::io::ErrorKind;
-use std::path::PathBuf;
-use std::process::Stdio;
 
 use ffmpeg_cli::FfmpegBuilder;
 
@@ -12,7 +8,7 @@ pub trait SetCommandExt<'a> {
 
 impl<'a> SetCommandExt<'a> for FfmpegBuilder<'a> {
     fn locate_command(mut self) -> FfmpegBuilder<'a> {
-        let mut bin_fpaths: Vec<&str>;
+        let mut bin_fpaths = Vec::new();
         #[cfg(target_os = "macos")]
         {
             bin_fpaths.extend([
