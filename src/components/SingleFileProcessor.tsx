@@ -48,7 +48,9 @@ const FileListItem = ({ filepath, style, status }: FileListItemProps) => {
           label={baseName(filepath)}
           withArrow
           multiline
-          w={'80%'}
+          sx={theme => ({
+            maxWidth: '80%',
+          })}
         >
           <Text
             size='sm'
