@@ -1,6 +1,6 @@
 import {
-  ActionIcon, Avatar, Center, Container,
-  Group, Loader, Menu, Paper, Stack, Text, ThemeIcon, Tooltip,
+  ActionIcon, Avatar, Box, Center, Container,
+  Group, Loader, Menu, Overlay, Paper, Stack, Text, ThemeIcon, Tooltip,
 } from "@mantine/core"
 import { useListState, useSetState } from "@mantine/hooks"
 import { showNotification } from "@mantine/notifications"
@@ -154,73 +154,118 @@ export const SingleFileProcessor = ({ title, command, accepts }: uiProps) => {
   }
 
   return (
-    <Container>
-      <Center>
-        <Stack
-          justify='flex-start'
-          spacing='md'
-          w='100%'>
-          <Container fluid pos='relative' p={0} mx='unset'>
-            <>
-              {droppedFiles.length > 0 && (
-                <Menu shadow='md' position='bottom-end' offset={0}>
-                  <Menu.Target>
-                    <ActionIcon
-                      size='md'
-                      radius='sm'
-                      color='blue'
-                      pos='absolute'
-                      right={0}
-                      top={0}
-                    >
-                      <IconDots size={18} />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown sx={theme => ({
-                    userSelect: 'none',
-                  })}>
-                    <Menu.Item
-                      icon={<IconPlaylistX size={14} />}
-                      onClick={clearFinishedFiles}
-                    >清除已完成的项</Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              )}
-              <Stack justify='flex-start' spacing='xs' mt={40}>
-                <AnimatePresence>
-                  {droppedFiles.length === 0 && (
-                    <motion.div
-                      key='empty-placeholder'
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: .2, ease: 'easeInOut' }}
-                    >
-                      <Center>
-                        <Text c='dimmed'>列表为空</Text>
-                      </Center>
-                    </motion.div>
-                  )}
-                  {droppedFiles.map(f => (
-                    <motion.div
-                      key={f}
-                      initial={{ opacity: 0, x: 200 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -100 }}
-                      transition={{ duration: .2 }}
-                    >
-                      <FileListItem
-                        filepath={f}
-                        status={fileStates[f] || Status.Processing}
-                      />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </Stack>
-            </>
+    <>
+      {dropping ? (
+        <motion.div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: .2 }}
+        >
+          <Container
+            p={0}
+            pos='absolute'
+            top={0}
+            left={0}
+            w='100%'
+            h='100%'
+            style={{
+              borderWidth: 3,
+              borderStyle: 'dashed',
+              borderRadius: 3,
+            }}
+            sx={theme => ({
+              backgroundColor: theme.colors.gray[2],
+              borderColor: theme.colors.gray[6],
+            })}
+          >
+            <Center h='100%'>
+              <Text
+                size='xl'
+                weight='bold'
+                sx={theme => ({
+                  color: theme.colors.dark[3],
+                })}
+              >松开鼠标以添加文件</Text>
+            </Center>
           </Container>
-        </Stack>
-      </Center>
-    </Container>
+        </motion.div>
+      ) : (
+        <Container>
+          <Center>
+            <Stack
+              justify='flex-start'
+              spacing='md'
+              w='100%'
+              opacity={dropping ? 0 : 1}>
+              <Container fluid pos='relative' p={0} mx='unset'>
+                <>
+                  {droppedFiles.length > 0 && (
+                    <Menu shadow='md' position='bottom-end' offset={0}>
+                      <Menu.Target>
+                        <ActionIcon
+                          size='md'
+                          radius='sm'
+                          color='blue'
+                          pos='absolute'
+                          right={0}
+                          top={0}
+                        >
+                          <IconDots size={18} />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown sx={theme => ({
+                        userSelect: 'none',
+                      })}>
+                        <Menu.Item
+                          icon={<IconPlaylistX size={14} />}
+                          onClick={clearFinishedFiles}
+                        >清除已完成的项</Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  )}
+                  <Stack justify='flex-start' spacing='xs' mt={40}>
+                    <AnimatePresence>
+                      {droppedFiles.length === 0 && (
+                        <motion.div
+                          key='empty-placeholder'
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: .2, ease: 'easeInOut' }}
+                        >
+                          <Center>
+                            <Text c='dimmed'>列表为空</Text>
+                          </Center>
+                        </motion.div>
+                      )}
+                      {droppedFiles.map(f => (
+                        <motion.div
+                          key={f}
+                          initial={{ opacity: 0, x: 200 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -100 }}
+                          transition={{ duration: .2 }}
+                        >
+                          <FileListItem
+                            filepath={f}
+                            status={fileStates[f] || Status.Processing}
+                          />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </Stack>
+                </>
+              </Container>
+            </Stack>
+          </Center>
+        </Container>
+      )}
+    </>
   )
 }
