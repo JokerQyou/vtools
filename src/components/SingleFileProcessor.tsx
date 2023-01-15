@@ -1,6 +1,6 @@
 import {
-  ActionIcon, Avatar, Box, Center, Container,
-  Group, Loader, Menu, Overlay, Paper, Stack, Text, ThemeIcon, Tooltip,
+  ActionIcon, Avatar, Center, Container,
+  Group, Loader, Menu, Paper, Stack, Text, ThemeIcon, Tooltip,
 } from "@mantine/core"
 import { useListState, useSetState } from "@mantine/hooks"
 import { showNotification } from "@mantine/notifications"
