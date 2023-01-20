@@ -7,7 +7,7 @@ import {
 import { useListState, useSetState } from "@mantine/hooks"
 import { showNotification } from "@mantine/notifications"
 import {
-  IconCheck, IconCircleX, IconDots,
+  IconCheck, IconCircleX, IconClockPlay, IconDots,
   IconHourglassEmpty,
   IconMovie, IconPlaylistX, IconSearch,
 } from "@tabler/icons"
@@ -64,17 +64,21 @@ const FileListItem = ({ filepath, style, status }: FileListItemProps) => {
           justifyContent: 'flex-end',
         })}>
           {status === trimStatus.Queued && (
-            <ThemeIcon size={20} radius='xl' color='teal'>
-              <IconHourglassEmpty />
-            </ThemeIcon>
+            <Tooltip label={status}>
+              <ThemeIcon size={20} radius='xs'>
+                <IconClockPlay />
+              </ThemeIcon>
+            </Tooltip>
           )}
           {status === trimStatus.Processing && (
             <Loader size={20} />
           )}
           {status === trimStatus.Finished && (
-            <ThemeIcon size={20} radius='xl' color='teal'>
-              <IconCheck />
-            </ThemeIcon>
+            <Tooltip label={status}>
+              <ThemeIcon size={20} radius='xl' color='teal'>
+                <IconCheck />
+              </ThemeIcon>
+            </Tooltip>
           )}
           <Tooltip label='在文件管理器中查看'>
             <ActionIcon>
@@ -170,9 +174,9 @@ export const FileEncodeTrimTool = () => {
     // If there are unprocessed files, pick one to process
     const queuedFiles = Object.entries(fileStates).filter(
       ([f, s]) => s === trimStatus.Queued
-    ).map(([f, s]) => f)
+    ).map(([f, s]) => f).sort()
     if (queuedFiles.length > 0) {
-      const nextFile = Object.keys(fileStates).sort()[0]
+      const nextFile = queuedFiles[0]
       const timeRange = timeRanges[nextFile]
       setFileStates(current => ({ ...current, [nextFile]: trimStatus.Processing }))
       invoke('encode_and_trim', {
@@ -180,13 +184,13 @@ export const FileEncodeTrimTool = () => {
         start: timeRange.start,
         end: timeRange.end,
       }).then((r: any) => {
-        console.log('processed:', r)
+        console.log('processed:', nextFile, r)
         // This will trigger current effect again, to check for next file
         setFileStates(current => ({ ...current, [nextFile]: trimStatus.Finished }))
       })
       return
     }
-  }, [fileStates])
+  }, [fileStates, timeRanges])
   const submitFileRanges = (values: typeof form.values) => {
     const newOnes = Object.fromEntries(
       values.files.map(fr => [fr.fpath, { start: fr.start, end: fr.end }])
@@ -212,6 +216,11 @@ export const FileEncodeTrimTool = () => {
     setFileStates(current => (
       Object.fromEntries(
         Object.entries(current).filter(([f, s]) => !finishedFiles.includes(f))
+      )
+    ))
+    setTimeRanges(current => (
+      Object.fromEntries(
+        Object.entries(current).filter(([f, _]) => !finishedFiles.includes(f))
       )
     ))
   }
