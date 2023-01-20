@@ -6,6 +6,7 @@ import { AppShell, Navbar, Header, Box, NavLink } from '@mantine/core';
 import { IconMovie, IconMusic, IconSlice } from "@tabler/icons";
 import { Flv2Mp4Tool } from "./components/ToolFlv2Mp4";
 import { ExtractAudioTool } from "./components/ToolExtractAudio";
+import { FileEncodeTrimTool } from "./components/ToolFileEncodeTrim";
 
 const enum Tool {
   Flv2mp4 = 'FLV转MP4',
@@ -13,13 +14,13 @@ const enum Tool {
   EncodeTrim = '精确修剪',
 }
 const NavBarItems = [
+  { icon: <IconSlice size={16} />, title: Tool.EncodeTrim },
   { icon: <IconMovie size={16} />, title: Tool.Flv2mp4 },
   { icon: <IconMusic size={16} />, title: Tool.ExtractAudio },
-  { icon: <IconSlice size={16} />, title: Tool.EncodeTrim },
 ]
 
 export default () => {
-  const [currentTool, setCurrentTool] = useState(Tool.Flv2mp4)
+  const [currentTool, setCurrentTool] = useState(Tool.EncodeTrim)
   return (
     <AppShell
       padding='sm'
@@ -59,7 +60,7 @@ export default () => {
         <ExtractAudioTool />
       )}
       {currentTool === Tool.EncodeTrim && (
-        <>Trim and re-encode</>
+        <FileEncodeTrimTool />
       )}
       {/* Your application here */}
     </AppShell>

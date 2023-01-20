@@ -16,11 +16,11 @@ export const enum Status {
   Finished = '完成',
 }
 
-const baseName = (f: string) => {
+export const baseName = (f: string) => {
   const fp = f.split(sep)
   return fp[fp.length - 1]
 }
-const extension = (f: string) => {
+export const extension = (f: string) => {
   if (!f.includes('.')) { return '' }
   const fp = f.split('.')
   return fp[fp.length - 1].toLowerCase()
