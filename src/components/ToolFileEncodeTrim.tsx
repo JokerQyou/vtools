@@ -210,14 +210,16 @@ export const FileEncodeTrimTool = () => {
   }
 
   const clearFinishedFiles = () => {
-    const finishedFiles = Object.keys(fileStates).filter(
-      f => fileStates[f] === trimStatus.Finished
-    )
-    setFileStates(current => (
-      Object.fromEntries(
+    const finishedFiles = Object.entries(fileStates).filter(
+      ([_, s]) => s === trimStatus.Finished
+    ).map(([f, _]) => f)
+    setFileStates(current => {
+      const fs = Object.fromEntries(
         Object.entries(current).filter(([f, s]) => !finishedFiles.includes(f))
       )
-    ))
+      console.log('FileStates:', fs)
+      return fs
+    })
     setTimeRanges(current => (
       Object.fromEntries(
         Object.entries(current).filter(([f, _]) => !finishedFiles.includes(f))
@@ -399,7 +401,7 @@ export const FileEncodeTrimTool = () => {
                           </Center>
                         </motion.div>
                       )}
-                      {Object.entries(fileStates).map(([f, status]) => (
+                      {Object.entries(fileStates).sort().map(([f, status]) => (
                         <motion.div
                           key={f}
                           initial={{ opacity: 0, x: 200 }}
