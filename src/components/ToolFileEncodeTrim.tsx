@@ -1,14 +1,13 @@
 import {
   ActionIcon, Avatar, Button, Center, Container,
   Grid,
-  Group, Loader, Menu, Modal, Paper, Space,
+  Group, Loader, Menu, Modal, Paper,
   Stack, Text, TextInput, ThemeIcon, Tooltip,
 } from "@mantine/core"
-import { useListState, useSetState } from "@mantine/hooks"
+import { useListState } from "@mantine/hooks"
 import { showNotification } from "@mantine/notifications"
 import {
   IconCheck, IconCircleX, IconClockPlay, IconDots,
-  IconHourglassEmpty,
   IconMovie, IconPlaylistX, IconSearch,
 } from "@tabler/icons"
 import { invoke } from "@tauri-apps/api"
@@ -64,7 +63,7 @@ const FileListItem = ({ filepath, style, status }: FileListItemProps) => {
           justifyContent: 'flex-end',
         })}>
           {status === trimStatus.Queued && (
-            <Tooltip label={status}>
+            <Tooltip label={status} withArrow>
               <ThemeIcon size={20} radius='xs'>
                 <IconClockPlay />
               </ThemeIcon>
@@ -74,7 +73,7 @@ const FileListItem = ({ filepath, style, status }: FileListItemProps) => {
             <Loader size={20} />
           )}
           {status === trimStatus.Finished && (
-            <Tooltip label={status}>
+            <Tooltip label={status} withArrow>
               <ThemeIcon size={20} radius='xl' color='teal'>
                 <IconCheck />
               </ThemeIcon>
@@ -91,20 +90,14 @@ const FileListItem = ({ filepath, style, status }: FileListItemProps) => {
   )
 }
 
-type TimeRange = {
-  start: string
-  end: string
-}
-
 export const FileEncodeTrimTool = () => {
   const [dropping, setDropping] = useState(false)
-  const [fileStates, setFileStates] = useSetState<{ [key: string]: trimStatus }>({})
-  const [timeRanges, setTimeRanges] = useSetState<{ [key: string]: TimeRange }>({})
 
   type FileTimeRange = {
     fpath: string
     start: string
     end: string
+    state: trimStatus
   }
   const form = useForm<{ files: FileTimeRange[] }>({
     initialValues: {
@@ -121,7 +114,6 @@ export const FileEncodeTrimTool = () => {
   })
   const formRef = useRef(form);
   const handleFileDrop = (e: TauriEventType<string[]>) => {
-    // console.log('Window dropped files:', e)
     setDropping(false)
 
     const validFiles = (e.payload).filter(
@@ -129,7 +121,6 @@ export const FileEncodeTrimTool = () => {
     ).filter(
       f => !formRef.current.values.files.some(ef => ef.fpath === f)
     )
-    console.log('Form files:', formRef.current.values.files)
     validFiles.map(vf => ({ fpath: vf, start: '', end: '' })).forEach(f => {
       formRef.current.insertListItem('files', f)
     })
@@ -161,70 +152,61 @@ export const FileEncodeTrimTool = () => {
       unlistenDropCancelled?.then(f => f())
     }
   }, [])
-
+  const [files, fileHandler] = useListState<FileTimeRange>([])
   useEffect(() => {
-    // No files to process
-    if (Object.keys(fileStates).length === 0) { return }
     // A file is being processed, wait for it to finish
-    const processingFiles = Object.entries(fileStates).filter(
-      ([f, s]) => s === trimStatus.Processing
-    )
-    if (processingFiles.length > 0) { return }
-
-    // If there are unprocessed files, pick one to process
-    const queuedFiles = Object.entries(fileStates).filter(
-      ([f, s]) => s === trimStatus.Queued
-    ).map(([f, s]) => f).sort()
-    if (queuedFiles.length > 0) {
-      const nextFile = queuedFiles[0]
-      const timeRange = timeRanges[nextFile]
-      setFileStates(current => ({ ...current, [nextFile]: trimStatus.Processing }))
-      invoke('encode_and_trim', {
-        sourceFpath: nextFile,
-        start: timeRange.start,
-        end: timeRange.end,
-      }).then((r: any) => {
-        console.log('processed:', nextFile, r)
-        // This will trigger current effect again, to check for next file
-        setFileStates(current => ({ ...current, [nextFile]: trimStatus.Finished }))
-      })
+    if (files.some(f => f.state === trimStatus.Processing)) {
       return
     }
-  }, [fileStates, timeRanges])
+    // All files are processed, nothing to do
+    let nextFileIndex = -1
+    files.some((f, i) => {
+      if (f.state === trimStatus.Queued) {
+        nextFileIndex = i
+        return true
+      }
+    })
+    // All files are processed, nothing to do
+    if (nextFileIndex === -1) {
+      return
+    }
+    // Process the next file
+    const nextFile = files[nextFileIndex]
+    fileHandler.setItemProp(nextFileIndex, 'state', trimStatus.Processing)
+    invoke('encode_and_trim', {
+      sourceFpath: nextFile.fpath,
+      start: nextFile.start,
+      end: nextFile.end,
+    }).then((r: any) => {
+      // nextFileIndex might be obsolete, need to find current index
+      let fIndex = -1
+      // handler.filter will actually change the list state in-place.
+      // we only want to read the latest state with it, not to change it,
+      // so the filter callback always return `true`.
+      fileHandler.filter((f, i) => {
+        if (f.fpath === nextFile.fpath) {
+          fIndex = i
+          return true
+        }
+        return true
+      })
+      if (fIndex === -1) {
+        return
+      }
+      fileHandler.setItemProp(fIndex, 'state', trimStatus.Finished)
+    })
+  }, [files])
+
   const submitFileRanges = (values: typeof form.values) => {
-    const newOnes = Object.fromEntries(
-      values.files.map(fr => [fr.fpath, { start: fr.start, end: fr.end }])
-    )
-    console.log('Submit:', newOnes)
-    setTimeRanges(current => ({
-      ...current,
-      ...newOnes,
-    }))
-    setFileStates(current => ({
-      ...current,
-      ...Object.fromEntries(
-        Object.keys(newOnes).map(f => [f, trimStatus.Queued])
-      )
-    }))
+    fileHandler.append(...values.files.map(f => ({ ...f, state: trimStatus.Queued })))
     form.reset()
   }
 
   const clearFinishedFiles = () => {
-    const finishedFiles = Object.entries(fileStates).filter(
-      ([_, s]) => s === trimStatus.Finished
-    ).map(([f, _]) => f)
-    setFileStates(current => {
-      const fs = Object.fromEntries(
-        Object.entries(current).filter(([f, s]) => !finishedFiles.includes(f))
-      )
-      console.log('FileStates:', fs)
-      return fs
-    })
-    setTimeRanges(current => (
-      Object.fromEntries(
-        Object.entries(current).filter(([f, _]) => !finishedFiles.includes(f))
-      )
-    ))
+    const finishedIndexes = files.map(
+      (f, i) => f.state === trimStatus.Finished ? i : -1
+    ).filter(i => i !== -1)
+    fileHandler.remove(...finishedIndexes)
   }
 
   return (
@@ -362,7 +344,7 @@ export const FileEncodeTrimTool = () => {
               opacity={dropping ? 0 : 1}>
               <Container fluid pos='relative' p={0} mx='unset'>
                 <>
-                  {Object.keys(fileStates).length > 0 && (
+                  {files.length > 0 && (
                     <Menu shadow='md' position='bottom-end' offset={0}>
                       <Menu.Target>
                         <ActionIcon
@@ -388,7 +370,7 @@ export const FileEncodeTrimTool = () => {
                   )}
                   <Stack justify='flex-start' spacing='xs' mt={40}>
                     <AnimatePresence>
-                      {Object.keys(fileStates).length === 0 && (
+                      {files.length === 0 && (
                         <motion.div
                           key='empty-placeholder'
                           initial={{ opacity: 0 }}
@@ -401,17 +383,17 @@ export const FileEncodeTrimTool = () => {
                           </Center>
                         </motion.div>
                       )}
-                      {Object.entries(fileStates).sort().map(([f, status]) => (
+                      {files.map(f => (
                         <motion.div
-                          key={f}
+                          key={f.fpath}
                           initial={{ opacity: 0, x: 200 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: -100 }}
                           transition={{ duration: .2 }}
                         >
                           <FileListItem
-                            filepath={f}
-                            status={status}
+                            filepath={f.fpath}
+                            status={f.state}
                           />
                         </motion.div>
                       ))}
