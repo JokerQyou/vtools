@@ -105,8 +105,8 @@ export const FileEncodeTrimTool = () => {
     },
     validate: {
       files: {
-        start: v => /^\d{2}:\d{2}\.\d{2,3}$/.test(v) ? null : '填写起始时间',
-        end: v => /^\d{2}:\d{2}\.\d{2,3}$/.test(v) ? null : '填写结束时间',
+        start: (v, vs, kpath) => /^\d{2}:\d{2}\.\d{2,3}$/.test(v) ? null : '填写起始时间',
+        end: (v, kpath) => /^\d{2}:\d{2}\.\d{2,3}$/.test(v) ? null : '填写结束时间',
       }
     },
     validateInputOnBlur: true,
@@ -186,7 +186,6 @@ export const FileEncodeTrimTool = () => {
       fileHandler.filter((f, i) => {
         if (f.fpath === nextFile.fpath) {
           fIndex = i
-          return true
         }
         return true
       })
@@ -197,16 +196,13 @@ export const FileEncodeTrimTool = () => {
     })
   }, [files])
 
-  const submitFileRanges = (values: typeof form.values) => {
+  const submitFiles = (values: typeof form.values) => {
     fileHandler.append(...values.files.map(f => ({ ...f, state: trimStatus.Queued })))
     form.reset()
   }
 
   const clearFinishedFiles = () => {
-    const finishedIndexes = files.map(
-      (f, i) => f.state === trimStatus.Finished ? i : -1
-    ).filter(i => i !== -1)
-    fileHandler.remove(...finishedIndexes)
+    fileHandler.filter(f => f.state !== trimStatus.Finished)
   }
 
   return (
@@ -219,7 +215,7 @@ export const FileEncodeTrimTool = () => {
           centered
           size='xl'
         >
-          <form onSubmit={form.onSubmit(vs => submitFileRanges(vs))}>
+          <form onSubmit={form.onSubmit(vs => submitFiles(vs))}>
             {form.values.files.map((ftr, index) => (
               <Paper
                 key={ftr.fpath}
