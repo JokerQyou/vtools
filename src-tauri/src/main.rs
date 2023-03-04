@@ -5,6 +5,7 @@
 
 use tauri::Manager;
 
+mod bilibili;
 mod encode_and_trim;
 mod extract_audio;
 mod ffmpeg;
@@ -24,6 +25,7 @@ fn main() {
             flv2mp4::flv2mp4,
             extract_audio::extract_audio,
             encode_and_trim::encode_and_trim,
+            bilibili::encode_bili_hires,
         ])
         .run(tauri::generate_context!())
         .expect("error while running vtools");

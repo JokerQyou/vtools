@@ -9,7 +9,7 @@ import { showNotification } from "@mantine/notifications"
 import {
   IconCheck, IconCircleX, IconClockPlay, IconDots,
   IconMovie, IconPlaylistX, IconSearch,
-} from "@tabler/icons"
+} from "@tabler/icons-react"
 import { invoke } from "@tauri-apps/api"
 import { listen, TauriEvent, Event as TauriEventType } from "@tauri-apps/api/event"
 import { CSSProperties, useEffect, useRef, useState } from "react"

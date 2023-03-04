@@ -3,20 +3,23 @@ import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import { AppShell, Navbar, Header, Box, NavLink } from '@mantine/core';
-import { IconMovie, IconMusic, IconSlice } from "@tabler/icons";
+import { IconBrandBilibili, IconMovie, IconMusic, IconSlice } from "@tabler/icons-react";
 import { Flv2Mp4Tool } from "./components/ToolFlv2Mp4";
 import { ExtractAudioTool } from "./components/ToolExtractAudio";
 import { FileEncodeTrimTool } from "./components/ToolFileEncodeTrim";
+import { BilibiliHiResEncodeTool } from "./components/ToolBiliHiResEncode";
 
 const enum Tool {
   Flv2mp4 = 'FLV转MP4',
   ExtractAudio = '提取音频',
   EncodeTrim = '精确修剪',
+  BiliHiRes = '封装B站无损音质',
 }
 const NavBarItems = [
   { icon: <IconSlice size={16} />, title: Tool.EncodeTrim },
   { icon: <IconMovie size={16} />, title: Tool.Flv2mp4 },
   { icon: <IconMusic size={16} />, title: Tool.ExtractAudio },
+  { icon: <IconBrandBilibili size={16} />, title: Tool.BiliHiRes }
 ]
 
 export default () => {
@@ -62,7 +65,9 @@ export default () => {
       {currentTool === Tool.EncodeTrim && (
         <FileEncodeTrimTool />
       )}
-      {/* Your application here */}
+      {currentTool === Tool.BiliHiRes && (
+        <BilibiliHiResEncodeTool />
+      )}
     </AppShell>
   )
 }

@@ -4,7 +4,7 @@ import {
 } from "@mantine/core"
 import { useListState, useSetState } from "@mantine/hooks"
 import { showNotification } from "@mantine/notifications"
-import { IconCheck, IconDots, IconMovie, IconPlaylistX, IconSearch } from "@tabler/icons"
+import { IconCheck, IconDots, IconMovie, IconPlaylistX, IconSearch } from "@tabler/icons-react"
 import { invoke } from "@tauri-apps/api"
 import { sep } from "@tauri-apps/api/path"
 import { listen } from "@tauri-apps/api/event"

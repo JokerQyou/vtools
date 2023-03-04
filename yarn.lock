@@ -697,10 +697,18 @@
   dependencies:
     "@babel/runtime" "^7.13.10"
 
-"@tabler/icons@^1.119.0":
-  version "1.119.0"
-  resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-1.119.0.tgz#8c590bc5a563c8673a78ccd451bedabd584b376e"
-  integrity sha512-Fk3Qq4w2SXcTjc/n1cuL5bccPkylrOMo7cYpQIf/yw6zP76LQV9dtLcHQUjFiUnaYuswR645CnURIhlafyAh9g==
+"@tabler/icons-react@^2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@tabler/icons-react/-/icons-react-2.7.0.tgz#365e69175dd7432d57ae228ded9f69613649ef27"
+  integrity sha512-WV2ZwMUuZN9QcCX4RPg9+G+ycUgoItzOWVCCQYVWbYKV581fH8szM2KVaQHQhMbttL4JYtOgf4ColJIDwsIgdw==
+  dependencies:
+    "@tabler/icons" "2.7.0"
+    prop-types "^15.7.2"
+
+"@tabler/icons@2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-2.7.0.tgz#565439df8dcbcedd6f75e555c513b3500f12239b"
+  integrity sha512-mSjUKhwN5fJHI9yITqFn9GXGnsJ4gBAyQDWyP4Ev5fk6hD78G7u6cHEF1KARr5FOOdiIKSZWCzNzUzyLhiNPrg==
 
 "@tauri-apps/api@^1.2.0":
   version "1.2.0"
@@ -1188,7 +1196,7 @@ postcss@^8.4.20:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-prop-types@^15.6.2, prop-types@^15.8.1:
+prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
