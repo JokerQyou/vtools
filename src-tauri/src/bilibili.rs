@@ -2,12 +2,16 @@ use std::path::PathBuf;
 use std::process::Stdio;
 
 use ffmpeg_cli::{FfmpegBuilder, File, Parameter};
+use tauri::Window;
 
-use crate::ffmpeg::SetCommandExt;
+use crate::{
+    ffmpeg::SetCommandExt,
+    utils::{FileItem, PROGRESS},
+};
 
 #[tauri::command]
-pub async fn encode_bili_hires(source_fpath: &str) -> Result<String, ()> {
-    let mut target_fpath = PathBuf::from(source_fpath);
+pub async fn encode_bili_hires(window: Window, mut file: FileItem) -> Result<String, ()> {
+    let mut target_fpath = PathBuf::from(file.filepath.as_str());
     let target_fstem = target_fpath.file_stem().unwrap();
     target_fpath = target_fpath
         .with_file_name(format!("{}-bili_hires", target_fstem.to_str().unwrap()))
@@ -18,7 +22,7 @@ pub async fn encode_bili_hires(source_fpath: &str) -> Result<String, ()> {
         .stderr(Stdio::piped())
         .option(Parameter::Single("nostdin"))
         .option(Parameter::Single("y"))
-        .input(File::new(source_fpath))
+        .input(File::new(&file.filepath.as_str()))
         .output(
             File::new(target_fpath.to_str().unwrap())
                 .option(Parameter::KeyValue("vcodec", "copy"))
@@ -30,7 +34,13 @@ pub async fn encode_bili_hires(source_fpath: &str) -> Result<String, ()> {
         );
 
     let ffmpeg = builder.run().await.unwrap();
-    dbg!(ffmpeg.process.wait_with_output().unwrap());
+    let result = dbg!(ffmpeg.process.wait_with_output().unwrap());
+    if result.status.success() {
+        file.progress = 100;
+    } else {
+        file.error = String::from_utf8(result.stderr).unwrap();
+    }
 
+    window.emit(PROGRESS, &file);
     Ok(String::from(target_fpath.to_str().unwrap()))
 }
