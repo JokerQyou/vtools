@@ -5,6 +5,8 @@
 
 use tauri::Manager;
 
+use tauri_plugin_log::LogTarget;
+
 mod bilibili;
 mod encode_and_trim;
 mod extract_audio;
@@ -13,6 +15,11 @@ mod flv2mp4;
 
 fn main() {
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_log::Builder::default()
+                .targets([LogTarget::LogDir, LogTarget::Stdout])
+                .build(),
+        )
         .setup(|app| {
             #[cfg(debug_assertions)]
             {

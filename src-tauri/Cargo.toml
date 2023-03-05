@@ -20,6 +20,8 @@ tauri = { version = "1.2", features = ["api-all"] }
 ffmpeg-cli = "0.1.0"
 futures = "0.3.25"
 ffprobe = "0.3.3"
+log = "0.4.17"
+tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
 
 [features]
 # by default Tauri runs in production mode
