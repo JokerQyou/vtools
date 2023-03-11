@@ -53,6 +53,7 @@
         console.log("DROP_HOVER", e);
         dropPosFetcher = setInterval(async () => {
           const pos: [number, number] = await invoke("mouse_viewport_pos");
+          // console.log("POS:", pos);
           let el: HTMLElement | null | undefined = document.elementFromPoint(
             ...pos
           ) as HTMLElement;
