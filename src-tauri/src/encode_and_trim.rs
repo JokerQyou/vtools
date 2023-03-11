@@ -88,7 +88,11 @@ pub async fn encode_and_trim(window: Window, mut file: FileItem) -> Result<Strin
         let mut target_fpath = PathBuf::from(source_fpath);
         let target_fstem = target_fpath.file_stem().unwrap().to_str().unwrap();
         target_fpath = target_fpath
-            .with_file_name(format!("{}-trimmed-{}", target_fstem, index))
+            .with_file_name(if segment.name.is_empty() {
+                format!("{}-segment-{}", target_fstem, index + 1)
+            } else {
+                format!("{}-{}", index + 1, segment.name)
+            })
             .with_extension(target_fpath.extension().unwrap());
 
         let start_str = segment.start.to_string();
@@ -145,8 +149,9 @@ pub async fn encode_and_trim(window: Window, mut file: FileItem) -> Result<Strin
                 })
             })
             .await;
-        let result = dbg!(ffmpeg.process.wait_with_output().unwrap());
+        let result = ffmpeg.process.wait_with_output().unwrap();
         print!("{}", String::from_utf8(result.stdout).unwrap());
+        print!("{}", String::from_utf8(result.stderr).unwrap());
 
         if result.status.success() {
             processed_duration += segment_duration;
