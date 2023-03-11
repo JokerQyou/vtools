@@ -7,9 +7,9 @@ This is not a full-featured ffmpeg wrapper, it's tailored specifically to my own
 
 # Project structure
 
-This is a pretty standard tauri app based on the official Tauri + React + Typescript template.
+This is a pretty standard tauri app based on the official Tauri + Svelte + Typescript template.
 
-- `src` contains the UI code. It's React + Typescript
+- `src` contains the UI code. It's Svelte + Typescript
 - `src-tauri` contains the native part. It's a standard Rust project.
 
 # Dev & release

@@ -1,33 +1,37 @@
 {
   "name": "vtools",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.5",
-    "@mantine/core": "^5.10.0",
-    "@mantine/dropzone": "^5.10.0",
-    "@mantine/form": "^5.10.1",
-    "@mantine/hooks": "^5.10.0",
-    "@mantine/notifications": "^5.10.0",
-    "@tabler/icons-react": "^2.7.0",
+    "@svelteuidev/composables": "^0.10.0",
+    "@svelteuidev/core": "^0.10.0",
+    "@svelteuidev/motion": "^0.10.0",
+    "@tabler/icons-svelte": "^2.7.0",
     "@tauri-apps/api": "^1.2.0",
-    "framer-motion": "^8.4.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "svelte-tiny-virtual-list": "^2.0.5",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.0.0",
     "@tauri-apps/cli": "^1.2.2",
+    "@tsconfig/svelte": "^3.0.0",
     "@types/node": "^18.7.10",
-    "@types/react": "^18.0.15",
-    "@types/react-dom": "^18.0.6",
-    "@vitejs/plugin-react": "^3.0.0",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21",
+    "postcss-load-config": "^4.0.1",
+    "sass": "^1.58.3",
+    "svelte": "^3.54.0",
+    "svelte-check": "^3.0.0",
+    "svelte-preprocess": "^5.0.0",
+    "tslib": "^2.4.1",
     "typescript": "^4.6.4",
     "vite": "^4.0.0"
   }

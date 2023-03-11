@@ -12,6 +12,7 @@ mod encode_and_trim;
 mod extract_audio;
 mod ffmpeg;
 mod flv2mp4;
+mod utils;
 
 fn main() {
     tauri::Builder::default()
@@ -33,6 +34,7 @@ fn main() {
             extract_audio::extract_audio,
             encode_and_trim::encode_and_trim,
             bilibili::encode_bili_hires,
+            utils::mouse_viewport_pos,
         ])
         .run(tauri::generate_context!())
         .expect("error while running vtools");
