@@ -1,10 +1,10 @@
 [package]
 name = "vtools"
-version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+version = "0.1.0"
+description = "Simple video tasks"
+authors = ["Joker Qyou"]
+license = "GPL-3.0-only"
+repository = "https://github.com/JokerQyou/vtools"
 edition = "2021"
 rust-version = "1.57"
 
