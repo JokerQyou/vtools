@@ -1,7 +1,22 @@
-# Tauri + Svelte + Typescript
+# vtools
 
-This template should help get you started developing with Tauri, Svelte and TypeScript in Vite.
+Simple GUI wrapping some of my frequently used ffmpeg commands.
 
-## Recommended IDE Setup
+I'm just getting tired of typing commands into terminal when doing simple video cutting tasks.
+This is not a full-featured ffmpeg wrapper, it's tailored specifically to my own needs.
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+# Project structure
+
+This is a pretty standard tauri app based on the official Tauri + Svelte + Typescript template.
+
+- `src` contains the UI code. It's Svelte + Typescript
+- `src-tauri` contains the native part. It's a standard Rust project.
+
+# Dev & release
+
+- Just `yarn tauri dev` to launch development instance.
+- `yarn tauri build` to build a release.
+
+# Notice
+
+I don't use Windows anymore, so it's unlikely to work (or even compile) on Windows. PRs are welcomed, though.
