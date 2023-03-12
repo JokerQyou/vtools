@@ -268,6 +268,11 @@
                       radius="xs"
                       variant="outline"
                       color="indigo"
+                      on:click={() => {
+                        invoke("reveal_file", {
+                          filePath: fileList[index].filepath,
+                        }).then(() => {});
+                      }}
                     >
                       <IconCurrentLocation size={16} />
                     </ActionIcon>

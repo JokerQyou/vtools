@@ -35,6 +35,7 @@ fn main() {
             encode_and_trim::encode_and_trim,
             bilibili::encode_bili_hires,
             utils::mouse_viewport_pos,
+            utils::reveal_file,
         ])
         .run(tauri::generate_context!())
         .expect("error while running vtools");
