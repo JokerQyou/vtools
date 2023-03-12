@@ -262,7 +262,7 @@
                       <IconX size={16} />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label="Revel" withArrow position="top">
+                  <Tooltip label="Reveal" withArrow position="top">
                     <ActionIcon
                       size="md"
                       radius="xs"
