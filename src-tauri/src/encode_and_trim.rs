@@ -88,7 +88,9 @@ pub async fn encode_and_trim(window: Window, mut file: FileItem) -> Result<Strin
         let mut target_fpath = PathBuf::from(source_fpath);
         let target_fstem = target_fpath.file_stem().unwrap().to_str().unwrap();
         target_fpath = target_fpath
-            .with_file_name(if segment.name.is_empty() {
+            .with_file_name(if llc_proj.cutSegments.len() == 1 {
+                format!("{}-trimmed", target_fstem)
+            } else if segment.name.is_empty() {
                 format!("{}-segment-{}", target_fstem, index + 1)
             } else {
                 format!("{}-{}", index + 1, segment.name)
@@ -137,7 +139,16 @@ pub async fn encode_and_trim(window: Window, mut file: FileItem) -> Result<Strin
                                 (((processed_duration + current) / total_segments_duration) * 100.0)
                                     .floor() as i8
                             }
-                            Status::End => 100,
+                            Status::End => {
+                                if index == llc_proj.cutSegments.len() - 1 {
+                                    100
+                                } else {
+                                    let current = progress.out_time.unwrap().as_secs_f64();
+                                    (((processed_duration + current) / total_segments_duration)
+                                        * 100.0)
+                                        .floor() as i8
+                                }
+                            }
                         };
                         file.progress = file_progress;
                         window.emit(PROGRESS, &file).unwrap_or(())
