@@ -21,6 +21,7 @@ pub async fn encode_bili_hires(window: Window, mut file: FileItem) -> Result<Str
         .locate_command()
         .stderr(Stdio::piped())
         .option(Parameter::Single("nostdin"))
+        .option(Parameter::KeyValue("v", "warning")) // avoid too much stdout content
         .option(Parameter::Single("y"))
         .input(File::new(&file.filepath.as_str()))
         .output(

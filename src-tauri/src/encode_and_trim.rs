@@ -113,6 +113,7 @@ pub async fn encode_and_trim(window: Window, mut file: FileItem) -> Result<Strin
             .locate_command()
             .stderr(Stdio::piped())
             .option(Parameter::Single("nostdin"))
+            .option(Parameter::KeyValue("v", "warning")) // avoid too much stdout content
             .option(Parameter::Single("y"))
             .input(
                 File::new(source_fpath)
@@ -161,8 +162,8 @@ pub async fn encode_and_trim(window: Window, mut file: FileItem) -> Result<Strin
             })
             .await;
         let result = ffmpeg.process.wait_with_output().unwrap();
-        print!("{}", String::from_utf8(result.stdout).unwrap());
-        print!("{}", String::from_utf8(result.stderr).unwrap());
+        dbg!("{}", String::from_utf8(result.stdout).unwrap());
+        dbg!("{}", String::from_utf8(result.stderr).unwrap());
 
         if result.status.success() {
             processed_duration += segment_duration;
